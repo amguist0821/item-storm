@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Item.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Walmart :: Event Processing :: Item :: Kafka</a> &gt; <a href="index.source.html" class="el_package">com.walmart.move.event.item.core</a> &gt; <span class="el_source">Item.java</span></div><h1>Item.java</h1><pre class="source lang-java linenums">package com.walmart.move.event.item.core;
+
+import java.io.Serializable;
+
+import javax.xml.bind.annotation.XmlRootElement;
+
+/**
+ * Class defines the contract that is to be utilized when it comes to processing
+ * freight within any type of node that is part of the Walmart Supply Chain.
+ * 
+ * @author amguist
+ *
+ */
+@XmlRootElement
+public class Item implements Serializable {
+	
+	/*
+	 * Class Member Variables
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private Long	walmartItemNumber;
+	
+	/**
+	 * Function is defined as the default class constructor which is needed in order to 
+	 * properly utilize JAX-B.
+	 */
+<span class="fc" id="L28">	public Item() {</span>
+		
+<span class="fc" id="L30">	}</span>
+	
+	/**
+	 * Function provides the ability to return back to the calling method the
+	 * Walmart Item Number that has been defined for a given Product.
+	 * 
+	 * @return Walmart Item Number
+	 */
+	public Long	getWalmartItemNumber() {
+<span class="fc" id="L39">		return(this.walmartItemNumber);</span>
+	}
+	
+	/**
+	 * Function provides the ability to override the current value of Walmart
+	 * Item Number based on the Walmart Item Number that is supplied within
+	 * the input parameters.
+	 * 
+	 * @param walmartItemNumber
+	 */
+	public void setWalmartItemNumber(Long walmartItemNumber) {
+<span class="fc" id="L50">		this.walmartItemNumber = walmartItemNumber;</span>
+<span class="fc" id="L51">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

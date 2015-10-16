@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>EventHeader.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Walmart :: Event Processing :: Item :: Kafka</a> &gt; <a href="index.source.html" class="el_package">com.walmart.move.eventing.core</a> &gt; <span class="el_source">EventHeader.java</span></div><h1>EventHeader.java</h1><pre class="source lang-java linenums">package com.walmart.move.eventing.core;
+
+import java.util.Date;
+import java.util.UUID;
+
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Class contains those information variables which are required in order to
+ * send messages over the Walmart Network to Event Brokers which are being consumed
+ * by those Event Consumers.
+ * 
+ * @author amguist
+ *
+ */
+@XmlRootElement()
+public class EventHeader {
+
+	/*
+	 * Class Member Variables
+	 */
+	private	String		id;
+	private String		name;
+	private String		type;
+	private String		user;
+<span class="fc" id="L29">	private Date		timestamp = new Date();</span>
+	private String		checksum;
+	private	EventOrigin	origin;
+	
+<span class="fc" id="L33">	private static final Logger		logger	=	LoggerFactory.getLogger(EventHeader.class);</span>
+	
+	/*
+	 * Class Static Constants
+	 */
+	private static final String		mdcCorrelationId	=	&quot;correlationId&quot;;
+	
+	/**
+	 * Function is defined as being the default class constructor that is to be
+	 * utilized in order to initialize the Event Header object to it's initial
+	 * state of being.
+	 */
+<span class="fc" id="L45">	public EventHeader() {</span>
+		
+<span class="fc" id="L47">	}</span>
+	
+	/**
+	 * Function is to be utilized in order to provide the ability to initialize
+	 * all of the required values of a given Event Notification object, thus
+	 * providing the ability to make sure that the Header Section is complete.
+	 * 
+	 * @param user
+	 * @param event
+	 * @param timestamp
+	 * @param checksum
+	 */
+<span class="fc" id="L59">	public EventHeader(String user, String event, Date timestamp, String checksum, EventType eventType, String eventSource) {</span>
+<span class="fc" id="L60">		this.id = UUID.randomUUID().toString();</span>
+<span class="fc" id="L61">		this.user = user;</span>
+<span class="fc" id="L62">		this.name = event;</span>
+<span class="fc" id="L63">		this.timestamp = timestamp;</span>
+<span class="fc" id="L64">		this.checksum = checksum;</span>
+<span class="fc" id="L65">		this.type = eventType.getEventTypeCode();</span>
+		
+<span class="fc" id="L67">		this.origin = new EventOrigin(eventSource);</span>
+<span class="fc" id="L68">	}</span>
+	
+	/**
+	 * Function is defined as being the overriding class constructor which is being
+	 * utilized in order to initialize the Event Header that is required for all
+	 * event messages being passed within the Supply Chain.
+	 * 
+	 * @param user
+	 * @param event
+	 */
+	public EventHeader(String user, String event, EventType eventType, String eventSource) {
+<span class="fc" id="L79">		this(user, event, new Date(), generateCheckSum(), eventType, eventSource);</span>
+<span class="fc" id="L80">	}</span>
+	
+	/**
+	 * Function will provide the ability to generate a new Check Sum value that
+	 * is to be associated with an Event Notification from within the Next Generation
+	 * Supply Chain.
+	 * 
+	 * @return Generated Check Sum 
+	 */
+	private static String	generateCheckSum() {
+<span class="fc" id="L90">		String checkSum = org.slf4j.MDC.get(mdcCorrelationId);</span>
+<span class="fc bfc" id="L91" title="All 4 branches covered.">		if(checkSum == null || checkSum.isEmpty()) {</span>
+<span class="fc" id="L92">			logger.warn(&quot;Checksum is not currently set ... did you forget to issue org.slf4j.MDC.put(\&quot;{}\&quot;.. from a Servlet request filter?&quot;);</span>
+		}
+<span class="fc" id="L94">		return(checkSum);</span>
+	}
+	
+	/**
+	 * Function will return back to the calling method the unique identifier
+	 * which is assigned to an Event Notification object upon being created from
+	 * within any type of product within the Next Generation Supply Chain.
+	 * 
+	 * @return
+	 */
+	public String	getId() {
+<span class="fc" id="L105">		return(this.id);</span>
+	}
+	
+	/**
+	 * Function will return back the class name of the object that is 
+	 * being transferred to the Event Framework from any of the products
+	 * within the Next Generation Supply Chain.
+	 * 
+	 * @return Name Of Event Object
+	 */
+	public String	getName() {
+<span class="fc" id="L116">		return(this.name);</span>
+	}
+	
+	/**
+	 * Function will return back the type of event that is being process
+	 * such as business, system, alert, etc. in order to provide the 
+	 * direction on event types.
+	 *  
+	 * @return Event Type
+	 */
+	public String	getType() {
+<span class="fc" id="L127">		return(this.type);</span>
+	}
+	
+	/**
+	 * Function will return back to the calling method the time at which
+	 * a given Event Message was generated.
+	 * 
+	 * @return Event Generation Time
+	 */
+	public Date	getTimestamp() {
+<span class="fc" id="L137">		return(this.timestamp);</span>
+	}
+	
+	/**
+	 * Function will be utilized in order to return back to the calling method
+	 * the check sum identifier that is to be utilized in order to keep all of
+	 * the messages within a given checksum together.
+	 *  
+	 * @return Event Check Sum
+	 */
+	public String	getChecksum() {
+<span class="fc" id="L148">		return(this.checksum);</span>
+	}
+	
+	/**
+	 * Function will be utilized in order to return back to the calling method the 
+	 * user who has performed some type of action against a domain thus generating
+	 * an event.
+	 * 
+	 * @return Event User Generator
+	 */
+	public String	getUser() {
+<span class="fc" id="L159">		return(this.user);</span>
+	}
+	
+	/**
+	 * Function will be utilized in order to return back to the calling method
+	 * the Origin at which a given Event occurred, which could be any type of
+	 * node, as well as, the source at which the event originated.
+	 * 
+	 * @return Event Origin
+	 */
+	public EventOrigin getOrigin() {
+<span class="fc" id="L170">		return(this.origin);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

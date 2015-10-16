@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>EventType.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Walmart :: Event Processing :: Item :: Kafka</a> &gt; <a href="index.source.html" class="el_package">com.walmart.move.eventing.core</a> &gt; <span class="el_source">EventType.java</span></div><h1>EventType.java</h1><pre class="source lang-java linenums">package com.walmart.move.eventing.core;
+
+/**
+ * Enumeration contains those applicable features which are needed in order to
+ * define the type of event which is being broadcast.  These events could be as 
+ * follows:
+ * 
+ * Business	-	0x000000001
+ * System   -   0x000000002
+ * Alert    -   0x000000003
+ * 
+ * @author amguist
+ *
+ */
+<span class="fc" id="L15">public enum EventType {</span>
+
+	/*
+	 * Defined Enumeration Types
+	 */
+<span class="fc" id="L20">	Business(1), System(2), Alert(3), None(99);</span>
+	
+	private	Integer	eventTypeCode;
+	
+	/**
+	 * Function is defined as being the default class constructor that is to be utilized
+	 * in order to initialize the Enumeration to it's initial state of being
+	 * thus allowing it to be consumed.
+	 * 
+	 * @param eventType
+	 */
+<span class="fc" id="L31">	EventType(Integer eventTypeCode) {</span>
+<span class="fc" id="L32">		this.eventTypeCode = eventTypeCode;</span>
+<span class="fc" id="L33">	}</span>
+	
+	/**
+	 * Function will return back to the calling method event type code that
+	 * has been assigned for a given Event Type.
+	 * 
+	 * @return Event Type Code
+	 */
+	public String	getEventTypeCode() {
+<span class="fc" id="L42">		return(Integer.toHexString(this.eventTypeCode));</span>
+	}
+	
+	/**
+	 * Function will be utilized in order to retrieve back to the calling method 
+	 * the entire Event Type Object that is associated the supplied event type 
+	 * code.
+	 * 
+	 * @param eventTypeCode
+	 * @return Event Type
+	 */
+	public static EventType	getEventType(int eventTypeCode) {
+<span class="fc" id="L54">		EventType	eventType = null;</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">		for( EventType currentEventType : EventType.values()) {</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">			if(currentEventType.eventTypeCode == eventTypeCode) {</span>
+<span class="fc" id="L57">				eventType = currentEventType;</span>
+			}
+		}
+<span class="fc" id="L60">		return(eventType);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

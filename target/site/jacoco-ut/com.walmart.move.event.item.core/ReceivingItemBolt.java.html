@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ReceivingItemBolt.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Walmart :: Event Processing :: Item :: Kafka</a> &gt; <a href="index.source.html" class="el_package">com.walmart.move.event.item.core</a> &gt; <span class="el_source">ReceivingItemBolt.java</span></div><h1>ReceivingItemBolt.java</h1><pre class="source lang-java linenums">package com.walmart.move.event.item.core;
+
+import org.apache.log4j.Logger;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.walmart.move.eventing.core.StringToGson;
+
+import backtype.storm.topology.BasicOutputCollector;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseBasicBolt;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
+
+/**
+ * Class will be utilized in order to provide the ability to transform an
+ * update that would have come from the Master Item service which would require
+ * to have changes done within the Receiving Product in order to update their
+ * item information.
+ * 
+ * @author amguist
+ *
+ */
+<span class="fc" id="L26">public class ReceivingItemBolt extends BaseBasicBolt {</span>
+
+	/*
+	 * Class Member Variables
+	 */
+	private static final long			serialVersionUID	=		1L;
+<span class="fc" id="L32">	private static final Logger			logger				=		Logger.getLogger(ReceivingItemBolt.class);</span>
+	
+	private static final String			MASTER_ORIGIN		= &quot;MasterItem&quot;;	
+	private static final String			dateFormat 			= &quot;dd MMM yyyy HH:mm:ss&quot;;			// Format required for JSON Conversion
+	
+	/**
+	 * Function is utilized in order to define those fields which are come out
+	 * from the processing of the initial event notification that was received 
+	 * over Apache Kafka and which have not been generated from a Next Generation
+	 * product.
+	 */
+	public void declareOutputFields(OutputFieldsDeclarer outputDeclarer) { 
+<span class="fc" id="L44">		outputDeclarer.declare(new Fields(&quot;correlation_identifier&quot;, &quot;receiving_item_object&quot;));</span>
+<span class="fc" id="L45">	}</span>
+	
+	/**
+	 * Function will examine the origin of the message in order to determine whether or not
+	 * the message needs to be formatted and published to the Item Master Bolt, which would 
+	 * send item updates to the Item Master first, else push information to the next Bolt which 
+	 * will then process the information and push to multiple bolts which require the item
+	 * update for their local copy of item.
+	 */
+	public void execute(Tuple input, BasicOutputCollector collector) {
+<span class="fc" id="L55">		String  correlationId = input.getString(0);</span>
+<span class="fc" id="L56">		String	eventOrigin = input.getString(1);</span>
+<span class="fc" id="L57">		String  eventObject = input.getString(2);</span>
+		
+<span class="fc" id="L59">		logger.info(&quot;Item Event Notification Orgin is: &quot; + eventOrigin);</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">		if( eventOrigin.equals(MASTER_ORIGIN)) {</span>
+<span class="fc" id="L61">			logger.info(&quot;[&quot; + correlationId + &quot;] - &quot; + &quot;Process is transforming information from Item Master to that of Receiving Item for the Receiving Product ....&quot;);</span>
+<span class="fc" id="L62">			logger.info(&quot;[&quot; + correlationId + &quot;] - &quot; + &quot;Event Object: &quot; + eventObject);</span>
+			
+<span class="fc" id="L64">			StringToGson&lt;Item&gt; stringToGson = new StringToGson&lt;Item&gt;(new TypeToken&lt;Item&gt;(){}.getType());</span>
+<span class="fc" id="L65">			Item item = stringToGson.convert(eventObject);</span>
+			
+<span class="fc" id="L67">			ReceivingItem receivingItem = new ReceivingItem();</span>
+<span class="fc" id="L68">			receivingItem.setReceivingItemNumber(item.getWalmartItemNumber());</span>
+<span class="fc" id="L69">			receivingItem.setItemName(&quot;Test_Item&quot;);</span>
+<span class="fc" id="L70">			receivingItem.setShortDescription(&quot;This Item Is A Test Item&quot;);</span>
+			
+<span class="fc" id="L72">			Gson gson	=	new GsonBuilder().setDateFormat(dateFormat).create();</span>
+<span class="fc" id="L73">			String receivingPayload = gson.toJson(receivingItem);</span>
+			/*
+			 *	Another Bolt will end up perform the transformation and then
+			 *  another Bolt will perform any additional calls to the Master Item
+			 *  Micro Service. 
+			 */
+<span class="fc" id="L79">			collector.emit(new Values(correlationId, receivingPayload));</span>
+		}
+<span class="fc" id="L81">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

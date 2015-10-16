@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>FileBasedWebConfig.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Walmart :: Event Processing :: Item :: Kafka</a> &gt; <a href="index.source.html" class="el_package">com.walmart.move.event.item</a> &gt; <span class="el_source">FileBasedWebConfig.java</span></div><h1>FileBasedWebConfig.java</h1><pre class="source lang-java linenums">package com.walmart.move.event.item;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+
+/**
+ * Class is needed in order to add application level properties at runtime, thus
+ * allowing for easier configuration of application preferences.
+ * 
+ * @author amguist
+ *
+ */
+@Singleton
+@Named
+public class FileBasedWebConfig implements IProcessConfig {
+
+	/*
+	 * Class Member Variables
+	 */
+<span class="fc" id="L26">	private	Configuration	config		=		null;</span>
+	
+	/**
+	 * Function is defined as being the default class constructor that is to be 
+	 * utilized in order to initialize a given product to it's initial state of
+	 * being.
+	 * 
+	 * @throws ConfigurationException
+	 */
+	@Inject
+<span class="fc" id="L36">	public FileBasedWebConfig() throws ConfigurationException {</span>
+<span class="fc" id="L37">		String	envStatus	=	System.getProperty(&quot;envStatus&quot;, &quot;dev&quot;);</span>
+<span class="fc" id="L38">		String	propFilePath =	envStatus + &quot;/app.properties&quot;;</span>
+		
+<span class="fc" id="L40">		CompositeConfiguration	cfg	= new CompositeConfiguration();</span>
+<span class="fc" id="L41">		cfg.addConfiguration(new PropertiesConfiguration(propFilePath));</span>
+		
+<span class="fc" id="L43">		this.config = cfg;</span>
+<span class="fc" id="L44">	}</span>
+	
+	/**
+	 * Function will be utilized in order to provide the ability to retrieve
+	 * back to the calling method the end point ( Zookeeper End Point ) which
+	 * a Kafka Spout is to be linked to for consuming messages.
+	 * 
+	 * @return Zookeeper Host
+	 */
+	public String	getZookeeperHost() {
+<span class="fc" id="L54">		return(config.getString(&quot;zookeeper.host&quot;, &quot;localhost:2181&quot;));</span>
+	}
+	
+	/**
+	 * Function will be utilized in order to retrieve back to the calling method
+	 * the Topic which the Processor is to consume messages from thus allowing for
+	 * the ability to receive those messages.
+	 * 
+	 * @return Listening Topic For Kafka Spout
+	 */
+	public String	getListeningTopic() {
+<span class="fc" id="L65">		return(config.getString(&quot;listening.topic&quot;, &quot;US.06067.ITEM&quot;));</span>
+	}
+	
+	/**
+	 * Function will be utilized in order to retrieve back to the calling method
+	 * the Number Of Threads that are to be utilized within a given Topic thus
+	 * allowing for the ability to do parallel processing.
+	 * 
+	 * @return
+	 */
+	public Integer	getNumberOfWorkers() {
+<span class="fc" id="L76">		return(config.getInteger(&quot;num.workers&quot;, 2));</span>
+	}
+	
+	/**
+	 * Function will return back to the calling method the topic which the Item
+	 * is to be published for other products to receive the transformation from the
+	 * Master Item.
+	 * 
+	 * @return Move Item Topic
+	 */
+	public String	getMoveItemTopic() {
+<span class="fc" id="L87">		return(config.getString(&quot;move.item.topic&quot;, &quot;US.06067.MOVE.ITEM&quot;));</span>
+	}
+	
+	/**
+	 * Function will return back to the calling method the list of possible 
+	 * Kafka Message Brokers which are required for publishing messages from
+	 * within the Next Generation Supply Chain space.
+	 * 
+	 * @return Kafka Broker List
+	 */
+	public String	getKafkaBrokerList() {
+<span class="fc" id="L98">		return(config.getString(&quot;kafka.broker.list&quot;, &quot;localhost:9092&quot;));</span>
+	}
+	
+	/**
+	 * Function will return back to the calling method the value of the
+	 * configured Request Required Acknowledgement which will be utilized 
+	 * in order to determine if acknowledgments are required or not.
+	 * 
+	 * @return Request Required Acknowledgment
+	 */
+	public Short	getRequestRequiredAcks() {
+<span class="fc" id="L109">		return(config.getShort(&quot;kafka.acknowledgement&quot;, new Short((short)1)));</span>
+	}
+	
+	/**
+	 * Function will be utilized in order to return back to the calling method
+	 * the Serializer class which is to be utilized for performing transformation
+	 * for the required Kafka format.
+	 * 
+	 * @return Kafka Serializer Class
+	 */
+	public String getSerializerClass() {
+<span class="fc" id="L120">		return(config.getString(&quot;kafka.serializer.class&quot;, &quot;kafka.serializer.StringEncoder&quot;));</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
